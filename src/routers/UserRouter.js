@@ -38,6 +38,24 @@ UserRouter.get('/:id', async (req, res) => {
   }
 })
 
+UserRouter.delete('/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id)
+
+    res.status(200).json({
+      success: true,
+      data: {
+        user,
+      },
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      data: 'Failed to remove User',
+    })
+  }
+})
+
 UserRouter.post('/register', async (req, res) => {
   const {
     login,
