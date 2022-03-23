@@ -4,6 +4,9 @@ import { User } from '../models/User.js'
 
 const UserRouter = express.Router()
 
+/**
+ * Get all users.
+ */
 UserRouter.get('/', async (req, res) => {
   try {
     const users = await User.find()
@@ -22,6 +25,9 @@ UserRouter.get('/', async (req, res) => {
   }
 })
 
+/**
+ * Get user by id.
+ */
 UserRouter.get('/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
@@ -38,6 +44,9 @@ UserRouter.get('/:id', async (req, res) => {
   }
 })
 
+/**
+ * Delete user by id.
+ */
 UserRouter.delete('/:id', async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id)
@@ -56,6 +65,9 @@ UserRouter.delete('/:id', async (req, res) => {
   }
 })
 
+/**
+ * Create new user.
+ */
 UserRouter.post('/register', async (req, res) => {
   const {
     login,
@@ -127,6 +139,9 @@ UserRouter.post('/register', async (req, res) => {
   }
 })
 
+/**
+ * Login user.
+ */
 UserRouter.post('/login', async (req, res) => {
   const {
     login,
