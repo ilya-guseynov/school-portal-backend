@@ -1,5 +1,6 @@
 import express from 'express'
 import { Group } from '../models/Group.js'
+import { StudentGroupRelation } from '../models/relations/StudentGroupRelation.js'
 
 const GroupRouter = express.Router()
 
@@ -64,11 +65,14 @@ GroupRouter.get('/:id', async (request, response) => {
 GroupRouter.delete('/:id', async (request, response) => {
   try {
     const deletedGroup = await Group.findByIdAndDelete(request.params.id)
+    const deletedStudentsGroupRelations =
+      await StudentGroupRelation.deleteMany({ groupId: request.params.id })
 
     response.status(200).json({
       success: true,
       data: {
         group: deletedGroup,
+        studentGroupRelations: deletedStudentsGroupRelations,
       },
     })
   } catch (error) {
