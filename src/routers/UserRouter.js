@@ -7,20 +7,22 @@ const UserRouter = express.Router()
 /**
  * Get all users.
  */
-UserRouter.get('/', async (req, res) => {
+UserRouter.get('/', async (_, response) => {
   try {
     const users = await User.find()
 
-    res.status(200).json({
+    response.status(200).json({
       success: true,
       data: {
         users,
       },
     })
   } catch (error) {
-    res.status(500).json({
+    response.status(500).json({
       success: false,
-      data: 'Failed to load Users',
+      data: {
+        message: 'Failed to load users',
+      },
     })
   }
 })
@@ -28,18 +30,31 @@ UserRouter.get('/', async (req, res) => {
 /**
  * Get user by id.
  */
-UserRouter.get('/:id', async (req, res) => {
+UserRouter.get('/:id', async (request, response) => {
   try {
-    const user = await User.findById(req.params.id)
+    const user = await User.findById(request.params.id)
 
-    res.status(200).json({
+    if (!user) {
+      response.status(400).json({
+        success: false,
+        data: {
+          message: 'User not found',
+        },
+      })
+    }
+
+    response.status(200).json({
       success: true,
-      data: user,
+      data: {
+        user,
+      },
     })
   } catch (error) {
-    res.status(500).json({
+    response.status(500).json({
       success: false,
-      data: 'Failed to load User',
+      data: {
+        message: 'Failed to load user',
+      },
     })
   }
 })
@@ -47,20 +62,22 @@ UserRouter.get('/:id', async (req, res) => {
 /**
  * Delete user by id.
  */
-UserRouter.delete('/:id', async (req, res) => {
+UserRouter.delete('/:id', async (request, response) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id)
+    const deletedUser = await User.findByIdAndDelete(request.params.id)
 
-    res.status(200).json({
+    response.status(200).json({
       success: true,
       data: {
-        user,
+        user: deletedUser,
       },
     })
   } catch (error) {
-    res.status(500).json({
+    response.status(500).json({
       success: false,
-      data: 'Failed to remove User',
+      data: {
+        message: 'Failed to remove User',
+      },
     })
   }
 })
@@ -68,7 +85,7 @@ UserRouter.delete('/:id', async (req, res) => {
 /**
  * Create new user.
  */
-UserRouter.post('/register', async (req, res) => {
+UserRouter.post('/register', async (request, response) => {
   const {
     login,
     password,
@@ -76,7 +93,7 @@ UserRouter.post('/register', async (req, res) => {
     firstName,
     lastName,
     middleName,
-  } = req.body
+  } = request.body
 
   if (
     !login
@@ -86,10 +103,10 @@ UserRouter.post('/register', async (req, res) => {
     || !lastName
     || !middleName
   ) {
-    res.status(400).json({
+    response.status(400).json({
       success: false,
       data: {
-        message: 'Bad input'
+        message: 'Bad input',
       },
     })
 
@@ -100,10 +117,10 @@ UserRouter.post('/register', async (req, res) => {
     const loginCheckList = await User.find({ login })
 
     if (loginCheckList.length > 0) {
-      req.status(400).json({
+      request.status(400).json({
         success: false,
         data: {
-          message: `User with login "${login} already exists"`
+          message: `User with login "${login} already exists"`,
         },
       })
 
@@ -121,16 +138,16 @@ UserRouter.post('/register', async (req, res) => {
       middleName,
     })
 
-    newUser.save()
+    await newUser.save()
 
-    res.status(200).json({
+    response.status(200).json({
       success: true,
       data: {
         user: newUser,
       },
     })
   } catch (error) {
-    res.status(500).json({
+    response.status(500).json({
       success: false,
       data: {
         message: 'Failed to create User',
@@ -142,14 +159,14 @@ UserRouter.post('/register', async (req, res) => {
 /**
  * Login user.
  */
-UserRouter.post('/login', async (req, res) => {
+UserRouter.post('/login', async (request, response) => {
   const {
     login,
     password,
-  } = req.body
+  } = request.body
 
   if (!login || !password) {
-    res.status(400).json({
+    response.status(400).json({
       success: false,
       data: {
         message: 'Bad input',
@@ -163,7 +180,7 @@ UserRouter.post('/login', async (req, res) => {
     const candidate = await User.findOne({ login })
 
     if (!candidate) {
-      res.status(400).json({
+      response.status(400).json({
         success: false,
         data: {
           message: `User with login "${login} doesn't exists"`,
@@ -176,7 +193,7 @@ UserRouter.post('/login', async (req, res) => {
     const passwordCorrect = await bcrypt.compare(password, candidate.password)
 
     if (!passwordCorrect) {
-      res.status(400).json({
+      response.status(400).json({
         success: false,
         data: {
           message: 'Bad input',
@@ -186,14 +203,14 @@ UserRouter.post('/login', async (req, res) => {
       return
     }
 
-    res.status(200).json({
+    response.status(200).json({
       success: true,
       data: {
         user: candidate,
       },
     })
   } catch (error) {
-    res.status(500).json({
+    response.status(500).json({
       success: false,
       data: {
         message: 'Failed to create User',
