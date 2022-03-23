@@ -41,6 +41,8 @@ UserRouter.get('/:id', async (request, response) => {
           message: 'User not found',
         },
       })
+
+      return
     }
 
     response.status(200).json({
