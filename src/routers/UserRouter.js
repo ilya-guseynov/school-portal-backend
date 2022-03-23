@@ -137,7 +137,7 @@ UserRouter.post('/login', async (req, res) => {
     res.status(400).json({
       success: false,
       data: {
-        message: 'Bad input'
+        message: 'Bad input',
       },
     })
 
@@ -151,7 +151,7 @@ UserRouter.post('/login', async (req, res) => {
       res.status(400).json({
         success: false,
         data: {
-          message: `User with login "${login} doesn't exists"`
+          message: `User with login "${login} doesn't exists"`,
         },
       })
 
@@ -164,7 +164,7 @@ UserRouter.post('/login', async (req, res) => {
       res.status(400).json({
         success: false,
         data: {
-          message: 'Bad input'
+          message: 'Bad input',
         },
       })
 
