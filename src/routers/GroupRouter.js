@@ -216,6 +216,53 @@ GroupRouter.post('/add-student', async (request, response) => {
   }
 })
 
+GroupRouter.post('/remove-student', async (request, response) => {
+  const { studentId, groupId } = request.body
+
+  if (!studentId || !groupId) {
+    response.status(400).json({
+      success: false,
+      data: {
+        message: 'Bad input',
+      },
+    })
+
+    return
+  }
+
+  try {
+    const deletedStudentGroupRelation = StudentGroupRelation.findOneAndDelete({
+      studentId,
+      groupId,
+    })
+
+    if (!deletedStudentGroupRelation) {
+      response.status(400).json({
+        success: false,
+        data: {
+          message: 'There is no student group relation',
+        },
+      })
+
+      return
+    }
+
+    response.status(200).json({
+      success: true,
+      data: {
+        studentGroupRelation: deletedStudentGroupRelation,
+      },
+    })
+  } catch (error) {
+    response.status(500).json({
+      success: false,
+      data: {
+        message: 'Failed to remove student from group',
+      },
+    })
+  }
+})
+
 export {
   GroupRouter,
 }
