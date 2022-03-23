@@ -1,5 +1,6 @@
 import express from 'express'
 import { Group } from '../models/Group.js'
+import { User } from '../models/User.js'
 import { StudentGroupRelation } from '../models/relations/StudentGroupRelation.js'
 
 const GroupRouter = express.Router()
@@ -130,6 +131,86 @@ GroupRouter.post('/', async (request, response) => {
       success: false,
       data: {
         message: 'Failed to create group',
+      },
+    })
+  }
+})
+
+/**
+ * Add student to group.
+ */
+GroupRouter.post('/add-student', async (request, response) => {
+  const { studentId, groupId } = request.body
+
+  if (!studentId || !groupId) {
+    response.status(400).json({
+      success: false,
+      data: {
+        message: 'Bad input',
+      },
+    })
+
+    return
+  }
+
+  try {
+    const group = await Group.findById(groupId)
+
+    if (!group) {
+      response.status(400).json({
+        success: false,
+        data: {
+          message: 'Group doesnt exists',
+        },
+      })
+
+      return
+    }
+
+    const student = await User.findById(studentId)
+
+    if (!student) {
+      response.status(400).json({
+        success: false,
+        data: {
+          message: 'Student doesnt exists',
+        },
+      })
+
+      return
+    }
+
+    const studentGroupRelationCheck = await StudentGroupRelation.find({ studentId })
+
+    if (studentGroupRelationCheck.length > 0) {
+      if (!student) {
+        response.status(400).json({
+          success: false,
+          data: {
+            message: 'Student already in group',
+          },
+        })
+      }
+
+      return
+    }
+
+    const newStudentGroupRelation = new StudentGroupRelation({ studentId, groupId })
+    await newStudentGroupRelation.save()
+
+    response.status(200).json({
+      success: true,
+      data: {
+        group,
+        student,
+        studentGroupRelation: newStudentGroupRelation,
+      },
+    })
+  } catch (error) {
+    response.status(500).json({
+      success: false,
+      data: {
+        message: 'Failed to add student to group',
       },
     })
   }
