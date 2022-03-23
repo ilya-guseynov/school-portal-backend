@@ -42,6 +42,8 @@ GroupRouter.get('/:id', async (request, response) => {
           message: 'Group not found',
         },
       })
+
+      return
     }
 
     response.status(200).json({
@@ -231,7 +233,7 @@ GroupRouter.post('/remove-student', async (request, response) => {
   }
 
   try {
-    const deletedStudentGroupRelation = StudentGroupRelation.findOneAndDelete({
+    const deletedStudentGroupRelation = await StudentGroupRelation.findOneAndDelete({
       studentId,
       groupId,
     })
@@ -258,6 +260,50 @@ GroupRouter.post('/remove-student', async (request, response) => {
       success: false,
       data: {
         message: 'Failed to remove student from group',
+      },
+    })
+  }
+})
+
+GroupRouter.get('/student-group/:id', async (request, response) => {
+  try {
+    const studentGroupRelation = await StudentGroupRelation.findOne({ studentId: request.params.id })
+
+    if (!studentGroupRelation) {
+      response.status(400).json({
+        success: false,
+        data: {
+          message: 'Group not found',
+        },
+      })
+
+      return
+    }
+
+    const group = await Group.findById(studentGroupRelation.groupId)
+
+    if (!group) {
+      response.status(400).json({
+        success: false,
+        data: {
+          message: 'Group not found',
+        },
+      })
+
+      return
+    }
+
+    response.status(200).json({
+      success: true,
+      data: {
+        group,
+      },
+    })
+  } catch (error) {
+    response.status(500).json({
+      success: false,
+      data: {
+        message: 'Failed to load group',
       },
     })
   }
