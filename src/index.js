@@ -4,6 +4,7 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 
 import { UserRouter } from './routers/UserRouter.js'
+import { GroupRouter } from './routers/GroupRouter.js'
 
 const start = async () => {
   const PORT = 4000
@@ -28,6 +29,8 @@ const start = async () => {
 
   app.use('/api/v1/user', UserRouter)
   console.log(`[school-portal-backend]: /api/v1/user - User router connected.`)
+  app.use('/api/v1/group', GroupRouter)
+  console.log(`[school-portal-backend]: /api/v1/group - Group router connected.`)
 
   app.listen(PORT, () => {
     console.log(`[school-portal-backend]: Server started on port ${ PORT }.`)
